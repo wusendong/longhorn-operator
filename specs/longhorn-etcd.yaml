@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: longhorn-etcd
+  labels:
+    app: longhorn-etcd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: longhorn-etcd
+  template:
+    metadata:
+      labels:
+        app: longhorn-etcd
+    spec:
+      containers:
+        - name: longhorn-etcd
+          image: 'quay.io/coreos/etcd:v3.1.5'
+          args:
+            - /usr/local/bin/etcd
+            - '--name'
+            - longhorn-etcd-server
+            - '--data-dir'
+            - '/tmp/etcd-data:/etcd-data'
+            - '--listen-client-urls'
+            - 'http://0.0.0.0:2379'
+            - '--advertise-client-urls'
+            - 'http://0.0.0.0:2379'
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /etcd-data
+              name: longhorn-etcd-server-claim0
+          ports:
+            - containerPort: 2379
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 5
+      volumes:
+        - name: longhorn-etcd-server-claim0
+          persistentVolumeClaim:
+            claimName: longhorn-etcd-server-claim0
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: longhorn-etcd
+  name: longhorn-etcd
+spec:
+  ports:
+    - name: '2379'
+      port: 2379
+      protocol: TCP
+      targetPort: 2379
+  selector:
+    app: longhorn-etcd
+  type: ClusterIP
+...

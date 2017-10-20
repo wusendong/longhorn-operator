@@ -1,0 +1,45 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: longhorn-driver
+  labels:
+    app: longhorn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: longhorn
+  template:
+    metadata:
+      labels:
+        app: longhorn
+    spec:
+      containers:
+      - name: longhorn-driver
+        image: rancher/storage-longhorn:11a4f5a
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /run
+          name: longhorn-storage-claim0
+        - mountPath: /var/run
+          name: longhorn-storage-claim1
+        - mountPath: /host/dev
+          name: longhorn-storage-claim2
+        - mountPath: /var/lib/rancher/volumes
+          name: longhorn-storage-claim3
+      restartPolicy: Always
+      volumes:
+      - hostPath:
+          path: /run
+        name: longhorn-storage-claim0
+      - hostPath:
+          path: /var/run
+        name: longhorn-storage-claim1
+      - hostPath:
+          path: /dev
+        name: longhorn-storage-claim2
+      - hostPath:
+          path: /var/lib/rancher/volumes
+        name: longhorn-storage-claim3

@@ -1,0 +1,87 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: longhorn-manager
+  labels:
+    app: longhorn-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: longhorn-manager
+  template:
+    metadata:
+      labels:
+        app: longhorn-manager
+    spec:
+      containers:
+        # - name: longhorn-engine-binary
+        #   image: 'rancher/longhorn-engine:046b5a5'
+        #   args:
+        #     - /bin/bash
+        #   imagePullPolicy: IfNotPresent
+        - name: longhorn-manager
+          image: 'rancher/longhorn-manager:63f2927-dirty'
+          args:
+            - launch-manager
+            - '-d'
+            - '--orchestrator'
+            - k8s
+            - '--engine-image'
+            - 'rancher/longhorn-engine:046b5a5'
+            - '--etcd-servers'
+            - 'http://longhorn-etcd:2379'
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /host/dev
+              name: longhorn-manager-claim0
+            - mountPath: /var/run
+              name: longhorn-manager-claim1
+            - mountPath: /var/lib/rancher/longhorn
+              name: longhorn-manager-claim2
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 1
+      volumes:
+        - name: longhorn-manager-claim0
+          hostPath:
+            path: /dev
+        - name: longhorn-manager-claim1
+          hostPath:
+            path: /var/run
+        - name: longhorn-manager-claim2
+          hostPath:
+            path: /var/lib/rancher/longhorn
+...
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     app: longhorn-manager
+#   name: longhorn-manager
+# spec:
+#   ports:
+#     - name: '9500'
+#       port: 9500
+#       protocol: TCP
+#       targetPort: 9500
+#     - name: '9507'
+#       port: 9507
+#       protocol: TCP
+#       targetPort: 9507
+#     - name: '9508'
+#       port: 9508
+#       protocol: TCP
+#       targetPort: 9508
+#   selector:
+#     app: longhorn-manager
+#   type: ClusterIP
+# ...
