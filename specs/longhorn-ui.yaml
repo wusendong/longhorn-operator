@@ -20,27 +20,26 @@ spec:
           image: 'rancher/longhorn-ui:b09b215'
           env:
             - name: LONGHORN_MANAGER_IP
-              value: 'http://172.17.0.7:9500'
+              value: 'http://longhorn-manager:9500'
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
-              hostPort: 8000
       restartPolicy: Always
-# ...
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   labels:
-#     app: longhorn-ui
-#   name: longhorn-ui
-# spec:
-#   ports:
-#     - name: '8000'
-#       port: 8000
-#       protocol: TCP
-#       targetPort: 8000
-#   selector:
-#     app: longhorn-ui
-#   type: NodePort
-# ...
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: longhorn-ui
+  name: longhorn-ui
+spec:
+  ports:
+    - name: '8000'
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app: longhorn-ui
+  type: NodePort
+...

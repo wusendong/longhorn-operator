@@ -1,9 +1,0 @@
-apiVersion: "stable.sap.cc/v1"
-kind: Critter 
-
-metadata:
-  name: lizard 
-
-spec:
-  owner: Esther
-  color: green

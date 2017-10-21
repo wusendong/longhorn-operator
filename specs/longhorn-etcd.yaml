@@ -38,8 +38,7 @@ spec:
       terminationGracePeriodSeconds: 5
       volumes:
         - name: longhorn-etcd-server-claim0
-          persistentVolumeClaim:
-            claimName: longhorn-etcd-server-claim0
+          emptyDir: {}
 ...
 ---
 apiVersion: v1

@@ -1,9 +1,0 @@
-apiVersion: "stable.sap.cc/v1"
-kind: Critter 
-
-metadata:
-  name: hamster
-
-spec:
-  owner: Michael
-  color: orange
