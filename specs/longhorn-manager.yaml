@@ -1,11 +1,11 @@
-apiVersion: apps/v1beta1
-kind: Deployment
+---
+apiVersion: apps/v1beta2
+kind: DaemonSet
 metadata:
   name: longhorn-manager
   labels:
     app: longhorn-manager
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: longhorn-manager
@@ -17,14 +17,17 @@ spec:
       initContainers:
         - name: longhorn-engine-binary
           image: 'rancher/longhorn-engine:046b5a5'
-          command: ['sh', '-c', 'cp -r /usr/local/bin/* /longhorn']
+          command:
+            - sh
+            - '-c'
+            - cp -r /usr/local/bin/* /longhorn
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - mountPath: /longhorn
-            name: longhorn-manager-claim3
+            - mountPath: /longhorn
+              name: longhorn-manager-claim3
       containers:
         - name: longhorn-manager
-          image: 'rancher/longhorn-manager:63f2927-dirty'
+          image: 'rancher/longhorn-manager:afa5193-dirty'
           args:
             - launch-manager
             - '-d'
@@ -47,6 +50,10 @@ spec:
             - mountPath: /usr/local/bin
               name: longhorn-manager-claim3
           terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 9500
+            - containerPort: 9507
+            - containerPort: 9508
           env:
             - name: MY_NODE_NAME
               valueFrom:
@@ -82,3 +89,26 @@ spec:
             path: /var/lib/rancher/longhorn
         - name: longhorn-manager-claim3
           emptyDir: {}
+...
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     app: longhorn-manager
+#   name: longhorn-manager
+# spec:
+#   ports:
+#     - name: '9500'
+#       port: 9500
+#       targetPort: 9500
+#     - name: '9507'
+#       port: 9507
+#       targetPort: 9507
+#     - name: '9508'
+#       port: 9508
+#       targetPort: 9508
+#   selector:
+#     app: longhorn-manager
+#   type: LoadBalancer
+# ...

@@ -1,12 +1,11 @@
 ---
-apiVersion: apps/v1beta1
-kind: Deployment
+apiVersion: apps/v1beta2
+kind: DaemonSet
 metadata:
   name: longhorn-ui
   labels:
     app: longhorn-ui
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: longhorn-ui
@@ -22,6 +21,7 @@ spec:
             - name: LONGHORN_MANAGER_IP
               value: 'http://longhorn-manager:9500'
           imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-c", "LONGHORN_MANAGER_IP=http://$LONGHORN_MANAGER_SERVICE_HOST:$LONGHORN_MANAGER_SERVICE_PORT_9500 && envsubst '${LONGHORN_MANAGER_IP}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]
           ports:
             - containerPort: 8000
       restartPolicy: Always

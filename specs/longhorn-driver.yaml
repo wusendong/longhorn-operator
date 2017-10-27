@@ -1,18 +1,17 @@
-apiVersion: apps/v1beta1
-kind: Deployment
+apiVersion: apps/v1beta2
+kind: DaemonSet
 metadata:
   name: longhorn-driver
   labels:
-    app: longhorn
+    app: longhorn-driver
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: longhorn
+      app: longhorn-driver
   template:
     metadata:
       labels:
-        app: longhorn
+        app: longhorn-driver
     spec:
       containers:
       - name: longhorn-driver

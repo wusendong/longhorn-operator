@@ -5,14 +5,24 @@ metadata:
   namespace: default
   name: longhorn-role
 rules:
-  - apiGroups:
-      - '*'
+  - apiGroups: ['*']
     resources:
       - services
       - pods
       - deployments
+      - customresourcedefinitions
     verbs:
       - '*'
+  - apiGroups:
+      - longhorn.rancher.com
+    resources:
+      - longhornsettings
+      - longhornvolumes
+    verbs: ['*']
+  - apiGroups: [""]
+    resources:
+    - nodes
+    verbs: ['*']
 ...
 ---
 kind: ClusterRoleBinding
